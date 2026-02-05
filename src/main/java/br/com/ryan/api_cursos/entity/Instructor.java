@@ -20,6 +20,6 @@ public class Instructor {
     @MapsId
     private User user;
 
-    @OneToMany(mappedBy = "intructor")
+    @OneToMany(mappedBy = "instructor")
     private List<Course> courses;
 }

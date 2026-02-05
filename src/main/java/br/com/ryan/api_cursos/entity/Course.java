@@ -5,6 +5,8 @@ import java.util.UUID;
 
 import br.com.ryan.api_cursos.enums.Category;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -27,12 +29,14 @@ public class Course {
     private UUID id;
     
     private String name;
-    private String desc;
+    private String description;
+    
+    @Enumerated(EnumType.STRING)
     private Category category;
 
     @ManyToOne
     @JoinColumn(name = "instructor_id", nullable = false)
-    private User instructor;
+    private Instructor instructor;
 
     @OneToMany(mappedBy = "course")
     private List<Lesson> lessons;
