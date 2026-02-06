@@ -24,17 +24,52 @@ public class MuxVideoService implements VideoService {
     @Override
     public String uploadVideoParaMux(MultipartFile file) {
         try {
-            Map<String, Object> data = this.GetMuxData(webClient);
+            Map<String, Object> data = this.GetMuxData();
             String uploadUrl = (String) data.get("url");
-            String assetId = (String) data.get("id");
+            String uploadId = (String) data.get("id");
+            System.out.print(data);
             SendVideoMux(uploadUrl, file);
-            return assetId;
+            Thread.sleep(3000);
+            return buscarAssetIdPeloUploadId(uploadId);
         } catch (Exception e) {
             throw new RuntimeException("Falha ao subir vídeo para o Mux", e);
         }
     }
 
-    private Map<String, Object> GetMuxData (WebClient webClient) {
+    private String buscarAssetIdPeloUploadId(String uploadId) {
+        Map<String, Object> response = webClient.get()
+                .uri("/video/v1/uploads/{upload_id}", uploadId)
+                .headers(h -> h.setBasicAuth(tokenId, tokenSecret))
+                .retrieve()
+                .bodyToMono(Map.class)
+                .block();
+
+        Map<String, Object> data = (Map<String, Object>) response.get("data");
+        
+        String assetId = (String) data.get("asset_id");
+        
+        return assetId;
+    }
+
+    public String getPlaybackId(String assetId) {
+        Map<String, Object> response = webClient.get()
+                .uri("/video/v1/assets/{asset_id}", assetId)
+                .headers(h -> h.setBasicAuth(tokenId, tokenSecret))
+                .retrieve()
+                .bodyToMono(Map.class)
+                .block();
+
+        Map<String, Object> data = (Map<String, Object>) response.get("data");
+        
+        List<Map<String, Object>> playbackIds = (List<Map<String, Object>>) data.get("playback_ids");
+        
+        if (playbackIds != null && !playbackIds.isEmpty()) {
+            return (String) playbackIds.get(0).get("id");
+        }
+        return null;
+    }
+
+    private Map<String, Object> GetMuxData () {
         Map<String, Object> uploadResponse = webClient.post()
                     .uri("/video/v1/uploads")
                     .headers(h -> h.setBasicAuth(tokenId, tokenSecret))

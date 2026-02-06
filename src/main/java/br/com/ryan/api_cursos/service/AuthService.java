@@ -3,6 +3,7 @@ package br.com.ryan.api_cursos.service;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -48,5 +49,9 @@ public class AuthService {
         if (userSaved.getRole().equals(Role.STUDENT)) studentRepository.save(new Student(userSaved));
         if (userSaved.getRole().equals(Role.INSTRUCTOR)) instructorRepository.save(new Instructor(userSaved));
         return new SignUpResponse(userSaved.getId(), userSaved.getName(), userSaved.getEmail(), userSaved.getRole());
+    }
+
+    public User getLoggedUser() {
+        return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal(); 
     }
 }

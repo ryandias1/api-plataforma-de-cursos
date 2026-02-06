@@ -23,8 +23,9 @@ public class Lesson {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    private int numAula;
+    private int numLesson;
     private String content;
+    private String assetId;
 
     @ManyToOne
     @JoinColumn(name = "course_id")

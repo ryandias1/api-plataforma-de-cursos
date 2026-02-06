@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import br.com.ryan.api_cursos.dto.request.ModifyCourseRequest;
 import br.com.ryan.api_cursos.dto.request.RegisterCourseRequest;
 import br.com.ryan.api_cursos.dto.response.CourseResponse;
+import br.com.ryan.api_cursos.dto.response.LessonResponse;
 import br.com.ryan.api_cursos.dto.response.UserResponse;
 import br.com.ryan.api_cursos.entity.Course;
 import br.com.ryan.api_cursos.entity.Instructor;
@@ -21,6 +22,7 @@ import br.com.ryan.api_cursos.enums.Category;
 import br.com.ryan.api_cursos.enums.Role;
 import br.com.ryan.api_cursos.repository.CourseRepository;
 import br.com.ryan.api_cursos.repository.InstructorRepository;
+import br.com.ryan.api_cursos.repository.LessonRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
@@ -29,13 +31,15 @@ import lombok.RequiredArgsConstructor;
 public class CourseService {
     private final CourseRepository courseRepository;
     private final InstructorRepository instructorRepository;
+    private final AuthService authService;
+    private final LessonRepository lessonRepository;
 
     public CourseResponse registerCourse(RegisterCourseRequest request) {
         Course course = new Course();
         course.setName(request.name());
         course.setDescription(request.description());
         course.setCategory(request.category());
-        User user = getLoggedUser();
+        User user = authService.getLoggedUser();
         if (user.getRole().equals(Role.INSTRUCTOR)) {
             Instructor instructor = instructorRepository.findById(user.getId()).orElseThrow(() -> new EntityNotFoundException("Instrutor não encontrado"));
             course.setInstructor(instructor);
@@ -65,7 +69,7 @@ public class CourseService {
 
     public CourseResponse modifyCourse(ModifyCourseRequest request, UUID id) {
         Course course = courseRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Curso não encontrado"));
-        if (!(getLoggedUser().getId().equals(course.getInstructor().getUser().getId()))) throw new AccessDeniedException("Este curso não é seu");
+        if (!(authService.getLoggedUser().getId().equals(course.getInstructor().getUser().getId()))) throw new AccessDeniedException("Este curso não é seu");
         if (!(request.name().isBlank())) course.setName(request.name());
         if (!(request.description().isBlank())) course.setDescription(request.description());
         if (!(request.category() == null)) course.setCategory(request.category());
@@ -73,12 +77,11 @@ public class CourseService {
         return toResponse(courseSaved);
     }
 
-    private User getLoggedUser() {
-        return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal(); 
-    }
-
     private CourseResponse toResponse(Course course) {
-        return new CourseResponse(course.getId(), course.getName(), course.getDescription(), course.getCategory(), toUserResponse(course.getInstructor()));
+        List<LessonResponse> lessons = lessonRepository.findByCourse(course).stream().map(lesson -> {
+            return new LessonResponse(lesson.getId(), lesson.getNumLesson(), lesson.getContent(), lesson.getCourse().getId(), lesson.getLink());
+        }).toList();
+        return new CourseResponse(course.getId(), course.getName(), course.getDescription(), course.getCategory(), toUserResponse(course.getInstructor()), lessons);
     }
 
     private UserResponse toUserResponse (Instructor instructor) {

@@ -1,5 +1,6 @@
 package br.com.ryan.api_cursos.dto.response;
 
+import java.util.List;
 import java.util.UUID;
 
 import br.com.ryan.api_cursos.enums.Category;
@@ -9,5 +10,6 @@ public record CourseResponse(
     String name,
     String description,
     Category category,
-    UserResponse instructor
+    UserResponse instructor,
+    List<LessonResponse> lesson
 ) {}
