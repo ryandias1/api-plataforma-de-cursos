@@ -15,16 +15,15 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import lombok.RequiredArgsConstructor;
+
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
 
-    private SecurityFilter securityFilter;
-
-    public SecurityConfig(SecurityFilter securityFilter) {
-        this.securityFilter = securityFilter;
-    }
+    private final SecurityFilter securityFilter;
     
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) {

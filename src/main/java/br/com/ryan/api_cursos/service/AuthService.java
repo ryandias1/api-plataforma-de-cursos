@@ -10,23 +10,25 @@ import br.com.ryan.api_cursos.dto.request.SignInRequest;
 import br.com.ryan.api_cursos.dto.request.SignUpRequest;
 import br.com.ryan.api_cursos.dto.response.SignInResponse;
 import br.com.ryan.api_cursos.dto.response.SignUpResponse;
+import br.com.ryan.api_cursos.entity.Instructor;
+import br.com.ryan.api_cursos.entity.Student;
 import br.com.ryan.api_cursos.entity.User;
+import br.com.ryan.api_cursos.enums.Role;
+import br.com.ryan.api_cursos.repository.InstructorRepository;
+import br.com.ryan.api_cursos.repository.StudentRepository;
 import br.com.ryan.api_cursos.repository.UserRepository;
 import br.com.ryan.api_cursos.security.TokenService;
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class AuthService {
-    private UserRepository userRepository;
-    private AuthenticationManager authenticationManager;
-    private TokenService tokenService;
-    private PasswordEncoder passwordEncoder;
-
-    public AuthService(UserRepository userRepository, AuthenticationManager authenticationManager, TokenService tokenService, PasswordEncoder passwordEncoder) {
-        this.userRepository = userRepository;
-        this.authenticationManager = authenticationManager;
-        this.tokenService = tokenService;
-        this.passwordEncoder = passwordEncoder;
-    }
+    private final UserRepository userRepository;
+    private final AuthenticationManager authenticationManager;
+    private final TokenService tokenService;
+    private final PasswordEncoder passwordEncoder;
+    private final StudentRepository studentRepository;
+    private final InstructorRepository instructorRepository;
 
     public SignInResponse signIn(SignInRequest request) {
         UsernamePasswordAuthenticationToken userAndPass = new UsernamePasswordAuthenticationToken(request.email(), request.password());
@@ -43,6 +45,8 @@ public class AuthService {
         user.setPassword(passwordEncoder.encode(request.password()));
         user.setRole(request.role());
         User userSaved = userRepository.save(user);
-        return new SignUpResponse(userSaved.getId(), userSaved.getName(), userSaved.getEmail());
+        if (userSaved.getRole().equals(Role.STUDENT)) studentRepository.save(new Student(userSaved));
+        if (userSaved.getRole().equals(Role.INSTRUCTOR)) instructorRepository.save(new Instructor(userSaved));
+        return new SignUpResponse(userSaved.getId(), userSaved.getName(), userSaved.getEmail(), userSaved.getRole());
     }
 }

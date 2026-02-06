@@ -14,17 +14,14 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 
 @Component
+@RequiredArgsConstructor
 public class SecurityFilter extends OncePerRequestFilter{
 
     private final TokenService tokenService;
     private final UserRepository userRepository;
-
-    public SecurityFilter(TokenService tokenService, UserRepository userRepository) {
-        this.tokenService = tokenService;
-        this.userRepository = userRepository;
-    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {

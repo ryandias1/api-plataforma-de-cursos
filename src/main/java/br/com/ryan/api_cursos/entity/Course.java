@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.UUID;
 
 import br.com.ryan.api_cursos.enums.Category;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -35,10 +36,11 @@ public class Course {
     private Category category;
 
     @ManyToOne
-    @JoinColumn(name = "instructor_id", nullable = false)
+    @JoinColumn(name = "instructor_id")
     private Instructor instructor;
 
-    @OneToMany(mappedBy = "course")
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL,
+    orphanRemoval = true)
     private List<Lesson> lessons;
 
     @OneToMany(mappedBy = "course")

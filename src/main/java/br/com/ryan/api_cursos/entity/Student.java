@@ -9,9 +9,15 @@ import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "Alunos")
+@Getter
+@Setter
+@NoArgsConstructor
 public class Student {
     @Id
     private UUID id;
@@ -23,4 +29,7 @@ public class Student {
     @OneToMany(mappedBy = "student")
     private List<Enrollment> enrollment;
 
+    public Student(User user) {
+        this.user = user;
+    }
 }
