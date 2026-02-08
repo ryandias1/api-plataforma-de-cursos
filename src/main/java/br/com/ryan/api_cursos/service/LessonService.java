@@ -29,7 +29,7 @@ public class LessonService {
 
     public LessonResponse createLesson(RegisterLessonRequest request) {
         Course course = courseRepository.findById(request.course_id()).orElseThrow(() -> new EntityNotFoundException("Curso não encontrado"));
-        if (!(authService.getLoggedUser().getId().equals(course.getInstructor().getUser().getId()))) throw new AccessDeniedException("Este curso não é seu");
+        if (!authService.getLoggedUser().getId().equals(course.getInstructor().getUser().getId())) throw new AccessDeniedException("Este curso não é seu");
         Lesson lesson = new Lesson();
         lesson.setNumLesson(request.numLesson());
         lesson.setContent(request.content());
@@ -42,7 +42,7 @@ public class LessonService {
     
     public String uploadLesson (UUID id ,MultipartFile file) {
         Lesson lesson = lessonRepository.findById(id).orElseThrow(() ->  new EntityNotFoundException("Aula não encontrada"));
-        if (!(authService.getLoggedUser().getId().equals(lesson.getCourse().getInstructor().getUser().getId()))) throw new AccessDeniedException("Este curso não é seu");
+        if (!authService.getLoggedUser().getId().equals(lesson.getCourse().getInstructor().getUser().getId())) throw new AccessDeniedException("Este curso não é seu");
         lesson.setAssetId(muxVideoService.uploadVideoParaMux(file));
         lessonRepository.save(lesson);
         return "AssetId definido, video esta subindo!";
@@ -50,7 +50,10 @@ public class LessonService {
 
     public LessonResponse updateLesson(ModifyLessonRequest request, UUID id) {
         Lesson lesson = lessonRepository.findById(id).orElseThrow(() ->  new EntityNotFoundException("Aula não encontrada"));
-        if (!(lesson.getCourse().getInstructor().getId().equals(authService.getLoggedUser().getId()))) throw new AccessDeniedException("Este curso não é seu");
+        if (!lesson.getCourse().getInstructor().getUser().getId()
+        .equals(authService.getLoggedUser().getId())) {
+            throw new AccessDeniedException("Este curso não é seu");
+        }
         if (!(request.content().isBlank())) lesson.setContent(request.content());
         lessonRepository.save(lesson);
         return new LessonResponse(lesson.getId(), lesson.getNumLesson(), lesson.getContent(), lesson.getCourse().getId(), lesson.getLink());

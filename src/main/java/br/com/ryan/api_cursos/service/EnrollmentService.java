@@ -43,8 +43,8 @@ public class EnrollmentService {
         enroll.setStudent(student);
         enroll.setEnrollmentTime(LocalDateTime.now());
         enroll.setEnrollmentStatus(EnrollmentStatus.ACTIVE);
-        Enrollment enrollSaved = enrollmentRepository.save(enroll);
-        return toEnrollmentResponse(enrollSaved);
+        student.getEnrollment().add(enroll);
+        return toEnrollmentResponse(enrollmentRepository.save(enroll));
     }
 
     public List<EnrollmentResponse> getEnrollments (int page, int size) {

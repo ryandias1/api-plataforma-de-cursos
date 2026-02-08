@@ -39,13 +39,15 @@ public class CourseService {
         course.setDescription(request.description());
         course.setCategory(request.category());
         User user = authService.getLoggedUser();
+        Instructor instructor;
         if (user.getRole().equals(Role.INSTRUCTOR)) {
-            Instructor instructor = instructorRepository.findById(user.getId()).orElseThrow(() -> new EntityNotFoundException("Instrutor não encontrado"));
-            course.setInstructor(instructor);
+            instructor = instructorRepository.findById(user.getId()).orElseThrow(() -> new EntityNotFoundException("Instrutor não encontrado"));
         } else {
             //Admin vira instrutor para lançar cursos oficiais da plataforma (como usar e outros)
-            course.setInstructor(new Instructor(user));
+            instructor = new Instructor(user);
         }
+        instructor.getCourses().add(course);
+        course.setInstructor(instructor);
         Course courseSaved = courseRepository.save(course);
         return toResponse(courseSaved);
     }
