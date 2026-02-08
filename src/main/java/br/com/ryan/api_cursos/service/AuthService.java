@@ -11,6 +11,7 @@ import br.com.ryan.api_cursos.dto.request.SignInRequest;
 import br.com.ryan.api_cursos.dto.request.SignUpRequest;
 import br.com.ryan.api_cursos.dto.response.SignInResponse;
 import br.com.ryan.api_cursos.dto.response.SignUpResponse;
+import br.com.ryan.api_cursos.dto.response.UserResponse;
 import br.com.ryan.api_cursos.entity.Instructor;
 import br.com.ryan.api_cursos.entity.Student;
 import br.com.ryan.api_cursos.entity.User;

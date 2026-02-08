@@ -76,14 +76,14 @@ public class CourseService {
         return toResponse(courseSaved);
     }
 
-    private CourseResponse toResponse(Course course) {
+    public CourseResponse toResponse(Course course) {
         List<LessonResponse> lessons = lessonRepository.findByCourse(course).stream().map(lesson -> {
             return new LessonResponse(lesson.getId(), lesson.getNumLesson(), lesson.getContent(), lesson.getCourse().getId(), lesson.getLink());
         }).toList();
-        return new CourseResponse(course.getId(), course.getName(), course.getDescription(), course.getCategory(), toUserResponse(course.getInstructor()), lessons);
+        return new CourseResponse(course.getId(), course.getName(), course.getDescription(), course.getCategory(), toInstructorResponse(course.getInstructor()), lessons);
     }
 
-    private UserResponse toUserResponse (Instructor instructor) {
+    private UserResponse toInstructorResponse (Instructor instructor) {
         return new UserResponse(instructor.getUser().getId(), instructor.getUser().getName(), instructor.getUser().getEmail());
     }
 }
