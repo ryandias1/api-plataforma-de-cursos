@@ -19,6 +19,7 @@ import br.com.ryan.api_cursos.repository.InstructorRepository;
 import br.com.ryan.api_cursos.repository.StudentRepository;
 import br.com.ryan.api_cursos.repository.UserRepository;
 import br.com.ryan.api_cursos.security.TokenService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -39,6 +40,7 @@ public class AuthService {
         return new SignInResponse(token);
     }
 
+    @Transactional
     public SignUpResponse signUp(SignUpRequest request) {
         User user = new User();
         user.setName(request.name());

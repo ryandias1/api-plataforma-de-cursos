@@ -31,7 +31,7 @@ public class CourseService {
     private final CourseRepository courseRepository;
     private final InstructorRepository instructorRepository;
     private final AuthService authService;
-    private final LessonRepository lessonRepository;
+    private final LessonService lessonService;
 
     public CourseResponse registerCourse(RegisterCourseRequest request) {
         Course course = new Course();
@@ -79,7 +79,7 @@ public class CourseService {
     }
 
     public CourseResponse toResponse(Course course) {
-        List<LessonResponse> lessons = lessonRepository.findByCourse(course).stream().map(lesson -> {
+        List<LessonResponse> lessons = lessonService.lessonsByCourse(course).stream().map(lesson -> {
             return new LessonResponse(lesson.getId(), lesson.getNumLesson(), lesson.getContent(), lesson.getCourse().getId(), lesson.getLink());
         }).toList();
         return new CourseResponse(course.getId(), course.getName(), course.getDescription(), course.getCategory(), toInstructorResponse(course.getInstructor()), lessons);

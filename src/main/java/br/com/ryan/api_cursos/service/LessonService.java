@@ -1,5 +1,6 @@
 package br.com.ryan.api_cursos.service;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.scheduling.annotation.Scheduled;
@@ -28,7 +29,7 @@ public class LessonService {
     private final AuthService authService;
 
     public LessonResponse createLesson(RegisterLessonRequest request) {
-        Course course = courseRepository.findById(request.course_id()).orElseThrow(() -> new EntityNotFoundException("Curso não encontrado"));
+        Course course = courseRepository.findById(request.courseId()).orElseThrow(() -> new EntityNotFoundException("Curso não encontrado"));
         if (!authService.getLoggedUser().getId().equals(course.getInstructor().getUser().getId())) throw new AccessDeniedException("Este curso não é seu");
         Lesson lesson = new Lesson();
         lesson.setNumLesson(request.numLesson());
@@ -57,6 +58,10 @@ public class LessonService {
         if (!(request.content().isBlank())) lesson.setContent(request.content());
         lessonRepository.save(lesson);
         return new LessonResponse(lesson.getId(), lesson.getNumLesson(), lesson.getContent(), lesson.getCourse().getId(), lesson.getLink());
+    }
+
+    public List<Lesson> lessonsByCourse (Course course) {
+        return lessonRepository.findByCourse(course);
     }
 
     @Scheduled(fixedRate = 120000)

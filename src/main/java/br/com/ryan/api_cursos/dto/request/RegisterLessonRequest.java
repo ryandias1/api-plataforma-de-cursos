@@ -8,5 +8,5 @@ import jakarta.validation.constraints.NotNull;
 public record RegisterLessonRequest(
     @NotNull int numLesson,
     @NotBlank String content,
-    @NotNull UUID course_id
+    @NotNull UUID courseId
 ) {}
