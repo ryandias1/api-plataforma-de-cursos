@@ -15,7 +15,6 @@ import br.com.ryan.api_cursos.entity.Lesson;
 import br.com.ryan.api_cursos.repository.CourseRepository;
 import br.com.ryan.api_cursos.repository.LessonRepository;
 import br.com.ryan.api_cursos.video.MuxVideoService;
-import br.com.ryan.api_cursos.video.VideoService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
@@ -43,6 +42,7 @@ public class LessonService {
     
     public String uploadLesson (UUID id ,MultipartFile file) {
         Lesson lesson = lessonRepository.findById(id).orElseThrow(() ->  new EntityNotFoundException("Aula não encontrada"));
+        if (!(authService.getLoggedUser().getId().equals(lesson.getCourse().getInstructor().getUser().getId()))) throw new AccessDeniedException("Este curso não é seu");
         lesson.setAssetId(muxVideoService.uploadVideoParaMux(file));
         lessonRepository.save(lesson);
         return "AssetId definido, video esta subindo!";
